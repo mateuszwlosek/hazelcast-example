@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  discovery-service:
+    build: ./discovery-service
+    ports:
+      - 8761:8761
+    depends_on:
+      - cloud-config-server
+    restart: unless-stopped
+  gateway-service:
+    build: ./gateway-service
+    ports:
+      - 8080:8080
+    depends_on:
+      - discovery-service
+      - cloud-config-server
+    restart: unless-stopped
+  mongodb:
+    image: mongo:4.2.6
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: hazelcast
+    volumes:
+      - ./database/hazelcast-init-data.js:/docker-entrypoint-initdb.d/hazelcast-init-data.js
+  hazelcast-test-service:
+    build: ./hazelcast-test-service
+    depends_on:
+      - discovery-service
+      - mongodb
+      - cloud-config-server
+    restart: unless-stopped
+  cloud-config-server:
+    build: ./cloud-config-server
+    ports:
+      - 8888:8080

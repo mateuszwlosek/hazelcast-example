@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: cloud-config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: file://cloud-config-storage
+          searchPaths: '{application}'
